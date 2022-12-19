@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:myapplication/constants/routes.dart';
 import 'package:myapplication/enums/menu_action.dart';
 import 'package:myapplication/services/auth/auth_service.dart';
+import 'package:myapplication/services/auth/bloc/auth_bloc.dart';
+import 'package:myapplication/services/auth/bloc/auth_event.dart';
 import 'package:myapplication/services/cloud/cloud_note.dart';
 import 'package:myapplication/services/cloud/firebase_cloud_storage.dart';
 import 'package:myapplication/utilities/dialogs/logout_dialog.dart';
 import 'package:myapplication/views/notes/notes_list_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart' show ReadContext;
 
 class MyApplicationView extends StatefulWidget {
   const MyApplicationView({super.key});
@@ -42,12 +45,8 @@ class _MyApplicationViewState extends State<MyApplicationView> {
                 case MenuAction.logout:
                   final shouldLogout = await showLogOutDialog(context);
                   if (shouldLogout) {
-                    await AuthService.firebase().logOut();
                     if (mounted) {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        loginRoute,
-                        (_) => false,
-                      );
+                      context.read<AuthBloc>().add(const AuthEventLogOut());
                     }
                   }
                   break;
